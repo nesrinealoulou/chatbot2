@@ -1,0 +1,52 @@
+[
+  {
+    "question": "Does Xeon 8468H support PCIe Gen 5.0? Explain based on the context only.",
+    "expected_answer": "Yes, the Intel Xeon Platinum 8468H supports PCIe Gen 5.0",
+    "model_answer": "Yes, the Xeon Platinum 8468H supports PCIe Gen 5.0. This is indicated in the context where it states \"8468H has_attribute pcie_version:5.0\"."
+  },
+  {
+    "question": "Which processor has faster RAM: 6530 or 6530P?",
+    "expected_answer": "Both the EPYC 6530 support DDR5 memory, with a memory speed of 4800 MT/s , however EPYC 6530P do not exist",
+    "model_answer": "The 6530P has faster RAM, with a maximum memory speed of 6400 MT/s compared to the 6530's 4800 MT/s."
+  },
+  {
+    "question": "Do the 7453 and 7573X have the same RAM speed support?",
+    "expected_answer": "Yes, both EPYC 7453 and EPYC 7573X support DDR4-3200 memory.",
+    "model_answer": "Yes, both the AMD EPYC 7453 and 7573X support DDR4 memory with a maximum speed of 3200 MT/s across 8 memory channels."
+  },
+  {
+    "question": "List the PCIe lanes, AVX support, and SIMD units for the EPYC 947F",
+    "expected_answer": "EPYC 9474F has, 128 lanes of PCIe Gen 5 , Supports AVX2 and AVX-512, and 8 simds units",
+    "model_answer": "The EPYC 9474F has 128 PCIe lanes, AVX support, and 8 SIMD units."
+  },
+  {
+    "question": "Which CPU has better memory bandwidth and FP64 performance: EPYC 9755 or Xeon 9470?",
+    "expected_answer": "EPYC 9755 has better memory bandwidth (12 channels vs 8) , i don't have enough context for fp64 performance",
+    "model_answer": "The EPYC 9755 has better memory bandwidth and FP64 performance. It supports DDR5 memory with a twelve-channel interface and a maximum speed of 6000 MT/s, while the Xeon 9470 supports DDR5 with an eight-channel interface and a maximum speed of 4800 MT/s. Additionally, the EPYC 9755 has a higher FP64 performance due to its higher clock speed and more cores."
+  },
+  {
+    "question": "Does the EPYC 947F support ECC and how many memory channels does it have?",
+    "expected_answer": "Yes, the EPYC 9474F supports ECC memory ",
+    "model_answer": "Yes, the EPYC 9474F supports ECC memory. It has 12 memory channels."
+  },
+  {
+    "question": "What is the base clock, boost clock, and number of PCIe lanes of the EPYC 96846?",
+    "expected_answer": "EPYC 9684X Base clock is 2.55 GHz and Boost clock: ~3.7 GHz and PCIe lanes: 128 (PCIe Gen 5.0)",
+    "model_answer": "The base clock of the EPYC 9684X is 2.55 GHz, the boost clock is 3.42 GHz, and it has 128 PCIe lanes. The EPYC 96846 is not available in the context."
+  },
+  {
+    "question": "Does the EPYC 9755 support AVX-512 and what is its memory type?",
+    "expected_answer": "yes EPYC 9755 supports  AVX-512 and DDR5 memory",
+    "model_answer": "Yes, the EPYC 9755 supports AVX-512. Its memory type is DDR5."
+  },
+  {
+    "question": "Which chip supports newer interconnect standards: 6726P-B or EPYC 6546P-B? ",
+    "expected_answer": "Xeon 6726P-B support Gen 4 however EPYC 6546P-B does not exist",
+    "model_answer": "The 6726P-B supports PCI-Express Gen 5 connection, while the EPYC 6546P-B is not mentioned in the context."
+  },
+  {
+    "question": "comapare Xeonn 9564 vs Epycc 9754?",
+    "expected_answer": "intel xeon 9564 does not exist , however The AMD EPYC 9754 is a server/workstation processor with 128 cores, launched in June 2023, at an MSRP of $11900. It is part of the EPYC lineup, using the Zen 4c (Bergamo) architecture with Socket SP5.",
+    "model_answer": "The AMD EPYC 9754 and Intel Xeon 9564 are both high-end server/workstation processors, but they have some key differences.\n\nThe AMD EPYC 9754 has 128 cores and 256 threads, while the Intel Xeon 9564 has 72 cores and 144 threads. This means the EPYC 9754 has more cores and threads, which can lead to better performance in multi-threaded workloads.\n\nThe EPYC 9754 is built on the Zen 4c (Bergamo) architecture with a 5 nm production process, while the Xeon 9564 is built on the Ice Lake architecture with a 10 nm production process. The smaller 5 nm process of the EPYC 9754 allows for more transistors (71,000 million) compared to the Xeon 9564 (56,000 million).\n\nThe EPYC 9754 has a base clock of 2.25 GHz and a boost clock of 3.1 GHz, while the Xeon 9564 has a base clock of 3.15 GHz and a boost clock of 4.2 GHz. This means the Xeon 9564 can reach higher clock speeds, which can lead to better performance in single-threaded workloads.\n\nBoth processors support DDR5 memory with a twelve-channel interface, but the EPYC 9754 has a higher officially supported memory speed of 4800 MT/s compared to the Xeon 9564's 6000 MT/s.\n\nIn terms of power consumption, the EPYC 9754 has a TDP of 360 W, while the Xeon 9564 has a TDP of 400 W. This means the EPYC 9754 is slightly less power-hungry, which can be beneficial for cooling and power costs.\n\nIn summary, the AMD EPYC 9754 has more cores and threads, a smaller production process, and slightly lower power consumption, while"
+  }
+]
