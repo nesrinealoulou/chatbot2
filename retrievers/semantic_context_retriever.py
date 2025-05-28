@@ -1,12 +1,8 @@
-# semantic_context_retriever.py
-
 import numpy as np
 import faiss
 
 def build_line_index(chunks, embed_model):
-    line_embeddings = []
-    line_texts = []
-    line_sources = []
+    line_embeddings, line_texts, line_sources = [], [], []
 
     for chunk in chunks:
         model_id = chunk["model_id"]
@@ -24,10 +20,8 @@ def build_line_index(chunks, embed_model):
 
     return index, line_texts, line_sources
 
-
 def search_semantic_lines(term_list, embed_model, index, line_texts, line_sources, model_ids=None, top_k=5):
     matched_lines = set()
-
     for term in term_list:
         query_emb = embed_model.encode(term)
         D, I = index.search(np.array([query_emb]), top_k)
@@ -35,7 +29,4 @@ def search_semantic_lines(term_list, embed_model, index, line_texts, line_source
             model_id, _ = line_sources[idx]
             if model_ids is None or model_id in model_ids:
                 matched_lines.add(line_texts[idx])
-
-
-    # Remove duplicates and return
-    return list(set(matched_lines))
+    return list(matched_lines)

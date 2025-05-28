@@ -23,70 +23,92 @@ The user asked:
 - Use `description` **only** if structured fields are missing.
 
 ----------------------------------------------------------------
+📌 ❓ Precision Clarification Requirement
+
+If the user question **does not explicitly specify** whether they want FP64 or FP32 performance, write:
+
+> "Do you want the peak double precision (FP64) or single precision (FP32) performance?"
+
+Do not proceed until the precision is clarified.
+
+----------------------------------------------------------------
 📌 Instructions for FP64 Performance Computation
 
-To compute theoretical double precision performance (FP64 GFLOPS), you MUST extract these **5 required values per processor**:
+To compute theoretical double precision (FP64) performance, extract and explain:
 
-1. **Socket Configuration**:
-   - Field: `socket_number`  
-   - Expected formats include: `1P`, `2P`, `1P / 2P`, `1S`, `2S`, `1S only`
-   - Interpret them as follows:
-     - `1P`, `1S`, or `1S only` → sockets = 1
-     - `2P` or `2S` → sockets = 2
-     - `1P / 2P`, `1S / 2S` → calculate both 1-socket and 2-socket FP64 values
+- Number of Sockets* (from socket_number)*
 
-2. **Total Number of Cores**:
-   - Field: `cores` or `number_of_cores`  
-     - Example: `6745P has_attribute cores:32`
+- Number of Cores* (from cores)*
 
-3. **Base Clock Frequency**:
-   - Field: `base_clock_ghz`  
-     - Accept values in GHz or convert from MHz
+- Base Clock (in GHz)* (from base_clock_ghz)*
 
-4. **SIMD Lanes per Core**:
-   - Field: `simd_units`  
-     - If missing, derive from AVX feature:
-       - `AVX`     → 2 SIMD lanes (128 bits ÷ 64)
-       - `AVX2`    → 4 SIMD lanes (256 bits ÷ 64)
-       - `AVX-512` → 8 SIMD lanes (512 bits ÷ 64)
-     - State the derivation logic if AVX-based
+- SIMD Lanes per Core* (from simd_lanes)*
 
-5. **FP64 Units per Core**:
-   - Field: `fp_units` or `fp64_units` 
+- FP64-capable Units per Core* (from fp64_units)*
+
+🧮 Formula:
+FP64 GFLOPS = Number of Sockets × Number of Cores × Base Clock (GHz) × SIMD Lanes × FP64 Units per Core
+- Only compute socket configurations that are explicitly supported in socket_number.
+- If socket_number is "1P", "1S", or "Single Socket", only compute for 1 socket.
+- If it is "2P", "2S", or "S2S", compute only for 2 sockets.
+- If the value is "1P / 2P" or "1S / 2S", compute both 1-socket and 2-socket performance.
+If both socket configurations are supported ("1P / 2P" or "1S / 2S"), state explicitly:
+"This processor supports both single-socket and dual-socket configurations, so we will compute performance for each."
+----------------------------------------------------------------
+✅ Your response must contain:
+
+- A separate section for each processor
+- General formula (as shown)
+- Extracted values listed clearly
+- Substitution step with values
+- Final result in GFLOPS
+- Both 1-socket and 2-socket calculations **if applicable**
 
 ----------------------------------------------------------------
-🧮 Formula for FP64 GFLOPS:
+📌 Instructions for FP64 Per-Core
 
-You MUST always use this formula:
-FP64 GFLOPS = socket_number × cores × base_clock_ghz × simd_lanes × fp64_units
+Only if requested:
+FP32 GFLOPS = Number of Sockets × Number of Cores × Base Clock (GHz) × SIMD Lanes × FP32 Units per Core
+----------------------------------------------------------------
+📌 Instructions for FP32 Performance
 
-- If the socket configuration is dual-compatible (e.g., `1P / 2P`, `1S / 2S`), compute **both** 1-socket and 2-socket values.
-- If it's `1P`, `1S`, or `1S only`, compute the 1-socket result only.
-- Never skip the `sockets` multiplier.
-- Never insert commas in numbers (e.g., write `4608 GFLOPS`, not `4,608 GFLOPS`).
+If user requests **single precision (FP32)**:
+
+- Use same values but substitute `fp32_units` instead.
+- If `fp32_units` is missing and `fp64_units` exists, assume:
+fp32_units = 2 × fp64_units
+
+🧮 Formula:
+FP32 GFLOPS = socket_number × cores × base_clock_ghz × simd_lanes × fp32_units
+
+- Only compute socket configurations that are explicitly supported in socket_number.
+- If socket_number is "1P", "1S", or "Single Socket", only compute for 1 socket.
+- If it is "2P", "2S", or "S2S", compute only for 2 sockets.
+- If the value is "1P / 2P" or "1S / 2S", compute both 1-socket and 2-socket performance.
+If both socket configurations are supported ("1P / 2P" or "1S / 2S"), state explicitly:
+"This processor supports both single-socket and dual-socket configurations, so we will compute performance for each."
+-----------------------------------------------------------
+📌 Instructions for FP32 Per-Core
+
+Only if requested:
+FP32_per_core = base_clock_ghz × simd_lanes × fp32_units
+- Only compute socket configurations that are explicitly supported in socket_number.
+- If socket_number is "1P" or "1S", only compute for 1 socket. If "2P", "2S", or "S2S", compute only 2 sockets. If "1P / 2P" or "1S / 2S", compute both.
+----------------------------------------------------------------
+📌 Final Answer Formatting Rules
+
+✅ Always:
+- Provide general formula
+- List extracted parameter values (each on its own line)
+- Substitute values visibly in the equation
+- Show both single and dual socket calculations if supported
+- Use consistent units (e.g., 3916.80 GFLOPS not 3,916.8)
+
+❌ Do not assume any missing value
+→ Instead say: "Missing {attribute}. Please provide it to compute performance."
+
+✅ Use a professional, clear, and friendly tone like in a client session.
 
 ----------------------------------------------------------------
-📌 Optional FP64 Per-Core Computation
 
-- If the user explicitly requests per-core FP64 performance: per_core_fp64 = base_clock_ghz × simd_lanes × fp64_units
-
-
-
-- Do **not** include cores or socket count in this case.
-
-----------------------------------------------------------------
-📌 Final Answer Rules
-
-- Do **not guess or assume** missing values.
-- If a required field is missing, respond:
-  `"Missing {attribute}. Please provide it to compute FP64 performance."`
-
-- Use:
-  - Clear, minimal sentences
-  - Exact formula substitution
-  - Explanations that match HPC engineering style
-
-----------------------------------------------------------------
-Now generate the most accurate and technically sound answer using the formula and structured context.
-
-
+Now respond to the user query using the structured context and the following precomputed metrics:
