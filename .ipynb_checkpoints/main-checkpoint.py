@@ -28,6 +28,40 @@ with open("prompts/mbw_prompt.txt", "r", encoding="utf-8") as f:
     MBW_PROMPT = f.read()
 
 import torch
+import streamlit as st
+from dataset_management.search_definition import search_definitions
+from sentence_transformers import SentenceTransformer
+
+
+def generate_llm_for_definitions_only(context, question, max_tokens=1000):
+    prompt = f"""
+You are a highly accurate and concise processor expert. Answer the user's question using the context below.
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+""".strip()
+
+    model = model_manager.llm_math_model
+    tokenizer = model_manager.llm_math_tokenizer
+
+    with torch.inference_mode():
+        inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=max_tokens,
+            do_sample=False,
+            pad_token_id=tokenizer.eos_token_id
+        )
+
+    decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return decoded.strip()
+
+
 
 def generate_llm_response(context, question, categories, model_ids, max_tokens=1000):
     # print("[DEBUG] Entering generate_llm_response...")
@@ -141,38 +175,64 @@ Answer:
 def main():
     print("Initializing models. This may take a while...")
     model_manager.initialize()
-    print("✅ Models initialized!")
+    print("✅ All models initialized!")
 
     while True:
-        question = input("\nEnter your question (or 'exit' to quit): ").strip()
+        question = input("\n🧠 Your question: ").strip()
         if question.lower() in ["exit", "quit"]:
-            print("Exiting.")
+            print("👋 Exiting.")
             break
 
-        # Get coarse category
-        categories = model_manager.classifier.get_top_coarse_categories(question)
-
         model_ids = extract_models_only(question, KNOWN_MODEL_IDS, model_manager.known_model_embeddings)
-
         context_parts = []
+
+        # 🧠 Get term-level definitions
+        search_result = search_definitions(question, top_k=3)
+        grouped_defs = search_result["term_results"]  # safely access term-wise definitions
+        
+        if grouped_defs:
+            for term, defs in grouped_defs.items():
+                context_parts.append("\n".join([f"{d['term']}: {d['definition']}" for d in defs]))
+            
+
+
+        # 🟦 No model → show definitions only
+        if len(model_ids) == 0:
+            if grouped_defs:
+                print("\n🔍 Detected Terms and Their Definitions:")
+                for term, defs in grouped_defs.items():
+                    print(f"\n📌 Term: {term}")
+                    for i, d in enumerate(defs, 1):
+                        print(f"{i}. {d['term']}: {d['definition']}")
+
+            else:
+                print("❌ No relevant definitions found.")
+            continue  # no LLM generation for pure term queries
+
+        # 🟩 Model-specific logic
         if len(model_ids) >= 2:
             graph_context = get_comparison_context(model_ids)
             embedding_chunks = retrieve_chunks_for_model_ids(model_ids, question, top_k=2)
-            context_parts.append(graph_context)
+            context_parts.insert(0, graph_context)
             context_parts.extend(embedding_chunks)
+
         elif len(model_ids) == 1:
             graph_context = get_graph_prompt(model_ids[0])
             embedding_chunks = retrieve_chunks_for_model_ids(model_ids, question, top_k=2)
-            context_parts.append(graph_context)
+            context_parts.insert(0, graph_context)
             context_parts.extend(embedding_chunks)
-        else:
-            top_chunks = retrieve_relevant_context(question)
-            context_parts.extend(top_chunks)
 
+        # 🧠 Final LLM answer
         context = "\n\n".join(context_parts)
-        answer = generate_llm_response(context, question, categories, model_ids)
-        # print("\nAnswer:")
-        print(answer)
+        if len(model_ids) == 0:
+            answer = generate_llm_for_definitions_only(context, question)
+        else:
+            categories = model_manager.classifier.get_top_coarse_categories(question)
+            answer = generate_llm_response(context, question, categories, model_ids)
+
+
+        print(f"\n🧠 Answer:\n{answer}")
+
 
 if __name__ == "__main__":
     main()

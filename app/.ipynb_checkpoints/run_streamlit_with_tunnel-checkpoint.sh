@@ -2,7 +2,7 @@
 
 export STREAMLIT_WATCH_FILES=false
 
-streamlit run app.py --server.address=0.0.0.0 --server.port=8510 --server.runOnSave false --server.fileWatcherType none > streamlit.log 2>&1 &
+streamlit run frontend.py --server.address=0.0.0.0 --server.port=8510 --server.runOnSave false --server.fileWatcherType none > streamlit.log 2>&1 &
 STREAMLIT_PID=$!
 echo "Streamlit started with PID $STREAMLIT_PID"
 sleep 5

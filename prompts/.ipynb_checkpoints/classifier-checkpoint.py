@@ -74,7 +74,7 @@ Respond with only the category name.
         performance_keywords = [
             "fp64", "fp32", "performance", "gflops", "tflops", "compute", "operations per second",
             "instructions", "execution", "vectorization", "scalar",
-            "floating point", "core speed", "processing power", "per-core fp", "per-core performance"
+            "floating point", "core speed", "processing power", "per-core fp", "per-core performance","high-throughput computation capacity"
         ]
     
         memory_keywords = [
